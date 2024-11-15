@@ -1,0 +1,198 @@
+openapi: 3.0.1
+info:
+  title: Profile Service API
+  description: API para la gestión de perfiles de usuario, incluyendo creación, actualización, eliminación y consulta.
+  version: 1.0.0
+
+paths:
+  /api/profiles/user-profile:
+    post:
+      summary: Crear un perfil de usuario.
+      requestBody:
+        description: Datos del perfil de usuario a crear.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfile'
+      responses:
+        '200':
+          description: Perfil de usuario creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: El perfil de usuario ya existe.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User profile already exists."
+
+  /api/profiles/{id}:
+    delete:
+      summary: Eliminar un perfil de usuario.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del perfil de usuario a eliminar.
+      responses:
+        '204':
+          description: Perfil de usuario eliminado exitosamente.
+        '404':
+          description: Perfil de usuario no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Profile not found."
+
+  /api/profiles:
+    put:
+      summary: Actualizar el perfil del usuario autenticado.
+      requestBody:
+        description: Datos del perfil a actualizar.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdateDto'
+      responses:
+        '200':
+          description: Perfil de usuario actualizado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Profile updated successfully."
+        '401':
+          description: Token faltante o inválido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Token is missing or invalid."
+        '404':
+          description: Perfil de usuario no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User profile not found."
+
+    get:
+      summary: Obtener el perfil del usuario autenticado.
+      responses:
+        '200':
+          description: Perfil de usuario autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Token faltante o inválido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Token is missing or invalid."
+        '404':
+          description: Perfil de usuario no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User profile not found."
+
+components:
+  schemas:
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: "user@example.com"
+        bio:
+          type: string
+          example: "A brief biography of the user."
+        address:
+          type: string
+          example: "123 Main St, Anytown, USA"
+        country:
+          type: string
+          example: "USA"
+        personalUrl:
+          type: string
+          example: "http://userwebsite.com"
+        nickname:
+          type: string
+          example: "UserNickname"
+        isContactInfoPublic:
+          type: boolean
+          example: true
+        organization:
+          type: string
+          example: "User's Organization"
+        socialLinks:
+          type: array
+          items:
+            type: string
+          example: ["http://facebook.com/user", "http://twitter.com/user"]
+
+    UserProfileUpdateDto:
+      type: object
+      properties:
+        bio:
+          type: string
+          example: "Updated biography."
+        address:
+          type: string
+          example: "456 New Address, Anytown, USA"
+        country:
+          type: string
+          example: "USA"
+        personalUrl:
+          type: string
+          example: "http://updatedwebsite.com"
+        nickname:
+          type: string
+          example: "UpdatedNickname"
+        isContactInfoPublic:
+          type: boolean
+          example: false
+        organization:
+          type: string
+          example: "Updated Organization"
+        socialLinks:
+          type: array
+          items:
+            type: string
+          example: ["http://linkedin.com/user", "http://instagram.com/user"]

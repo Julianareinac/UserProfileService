@@ -104,5 +104,50 @@ public class ProfilesController : ControllerBase
         return Ok(new { message = "Profile updated successfully." });
     }
 
+    [HttpGet]
+    public IActionResult GetAuthenticatedUserProfile()
+    {
+        // Extraer el token JWT del encabezado Authorization
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+        if (string.IsNullOrEmpty(token))
+        {
+            return Unauthorized(new { message = "Token is missing." });
+        }
+
+        // Deserializar el token JWT para obtener los claims
+        var handler = new JwtSecurityTokenHandler();
+        var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+        if (jsonToken == null)
+        {
+            return Unauthorized(new { message = "Invalid token." });
+        }
+
+        // Extraer el 'id' del token
+        var userIdClaim = jsonToken?.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim))
+        {
+            return Unauthorized(new { message = "Invalid token or user ID not found." });
+        }
+
+        // Convertir el ID extraído a long
+        if (!long.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized(new { message = "Invalid user ID." });
+        }
+
+        // Buscar el perfil del usuario en la base de datos
+        var userProfile = _context.UserProfiles.FirstOrDefault(p => p.Id == userId);
+        if (userProfile == null)
+        {
+            return NotFound(new { message = "Profile not found" });
+        }
+
+        return Ok(userProfile);
+    }
+
+
 
 }
